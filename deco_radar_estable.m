@@ -37,7 +37,7 @@ else
     break;
 end
 %
-% Depende de como se lea, el largo del vector ser· el doble o no -16 bits
+% Depende de como se lea, el largo del vector ser√° el doble o no -16 bits
 % Si el largo se divide en 2 al leer con 16, quiere decir que los 1024
 %  de inicio debieran ser 512.
 % Del mismo modo los saltos debieran ser de 1024 bytes y no de 512
@@ -46,7 +46,7 @@ disp('bits per data: ')
 disp(bits_x_data);
 pause
 
-[num_filas num_col] = size(A);  %ser· 512 o 1023 de acuerdo a los bits de lectura
+[num_filas num_col] = size(A);  %ser√° 512 o 1023 de acuerdo a los bits de lectura
 disp('Row number'); disp(num_filas); pause;
 disp('Header'); disp(header); pause;
 num_filas = num_filas - header; % Se restan los "header" bytes de cabecera
@@ -55,7 +55,7 @@ disp('Row number updated'); disp(num_filas); pause;
 disp('Scan number:');
 scan_number = num_filas / samples_x_scan;
 disp(scan_number);
-scan_number = (round(scan_number)); % Aproxima al m·s cercano. 
+scan_number = (round(scan_number)); % Aproxima al m√°s cercano. 
 
 disp('Scan number rounded:');
 disp(scan_number);
@@ -76,18 +76,30 @@ for j = 1:scan_number
 end
 %--
 % Para 16 bits, el primer word del trazo corresponde al identificador
-% numÈrico del trazo 0x0001, 0x0002, 0x0003 ...
+% num√©rico del trazo 0x0001, 0x0002, 0x0003 ...
 %--
 % Para 8 bits, el primer word del trazo corresponde a la clave 0xFFFF.
 
 %%
 column = 1;
-% Original
-%plot(B((offset + 1):samples_x_scan,columna))
+compensated = zeros(samples_x_scan,scan_number);
 media = mean(B);
-compensated = B(:,column) - media(1,column);
-% Offset removed
-plot(compensated((offset + 1):samples_x_scan,1));
+% 
+
+for j=1:scan_number
+    for i=1:samples_x_scan
+        compensated(i,j) = B(i,j) - media(1,j);
+    end
+end
+
+plot(compensated((offset + 1):samples_x_scan,column));
+% compensated = B(:,column) - media(1,column);
+% plot(compensated((offset + 1):samples_x_scan,1));
+
 %%
+
+figure,imagesc(compensated);
+colormap(gray);
+colorbar;
 fclose(fid);
 fclose('all');
